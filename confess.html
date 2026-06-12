@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bisikan — Confess Anonymously</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:     #0D1117;
+      --charcoal: #1A1F2E;
+      --card:     #1E2436;
+      --rose:     #C9748A;
+      --rose-dim: #8C4F61;
+      --lavender: #8B85C1;
+      --cream:    #F5EFE6;
+      --muted:    #7A8099;
+      --border:   #2C3250;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Stars background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 12% 18%, rgba(245,239,230,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 44% 9%,  rgba(139,133,193,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 76% 24%, rgba(245,239,230,.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 55%, rgba(201,116,138,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 72%, rgba(245,239,230,.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 65% 80%, rgba(139,133,193,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 5%  90%, rgba(245,239,230,.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 92% 10%, rgba(245,239,230,.3) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(13,17,23,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.5rem;
+      color: var(--cream);
+      letter-spacing: .02em;
+    }
+    .logo span { color: var(--rose); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .85rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--cream); }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 100px 24px 72px;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      color: var(--rose);
+      letter-spacing: .04em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 400;
+      line-height: 1.18;
+      max-width: 700px;
+      margin: 0 auto 20px;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: .95rem;
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Compose card ── */
+    .compose-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .compose-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .compose-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--rose), var(--lavender));
+    }
+
+    .compose-label {
+      font-family: 'Caveat', cursive;
+      font-size: 1rem;
+      color: var(--lavender);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .compose-card textarea {
+      width: 100%;
+      min-height: 140px;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      color: var(--cream);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      caret-color: var(--rose);
+    }
+    .compose-card textarea::placeholder {
+      color: var(--muted);
+      opacity: .6;
+    }
+
+    .compose-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+    }
+
+    .compose-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .mood-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .mood-label {
+      font-size: .75rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .mood-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: .8rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .mood-btn:hover,
+    .mood-btn.active {
+      border-color: var(--rose);
+      color: var(--rose);
+      background: rgba(201,116,138,.08);
+    }
+
+    .send-btn {
+      background: var(--rose);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 28px;
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    .send-btn:hover { background: var(--rose-dim); }
+    .send-btn:active { transform: scale(.97); }
+
+    .anon-note {
+      width: 100%;
+      text-align: center;
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .anon-note svg { opacity: .5; }
+
+    /* ── Feed ── */
+    .feed-section {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
+    }
+
+    .feed-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .feed-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+    }
+    .feed-count {
+      font-family: 'Caveat', cursive;
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: .78rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-chip:hover { border-color: var(--lavender); color: var(--lavender); }
+    .filter-chip.active {
+      background: rgba(139,133,193,.12);
+      border-color: var(--lavender);
+      color: var(--lavender);
+    }
+
+    /* ── Confess cards ── */
+    .confess-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .confess-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 28px 22px;
+      position: relative;
+      transition: border-color .2s, transform .2s;
+    }
+    .confess-card:hover {
+      border-color: #3a405e;
+      transform: translateY(-2px);
+    }
+
+    /* mood accent strip */
+    .confess-card[data-mood="sedih"]    { border-left: 3px solid #7BA7C2; }
+    .confess-card[data-mood="marah"]    { border-left: 3px solid #C27B7B; }
+    .confess-card[data-mood="senang"]   { border-left: 3px solid #C2B97B; }
+    .confess-card[data-mood="bingung"]  { border-left: 3px solid var(--lavender); }
+    .confess-card[data-mood="cinta"]    { border-left: 3px solid var(--rose); }
+
+    .confess-mood {
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .confess-mood .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .confess-card[data-mood="sedih"]   .dot { background: #7BA7C2; }
+    .confess-card[data-mood="marah"]   .dot { background: #C27B7B; }
+    .confess-card[data-mood="senang"]  .dot { background: #C2B97B; }
+    .confess-card[data-mood="bingung"] .dot { background: var(--lavender); }
+    .confess-card[data-mood="cinta"]   .dot { background: var(--rose); }
+
+    .confess-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--cream);
+      margin-bottom: 20px;
+    }
+
+    .confess-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    .confess-time { letter-spacing: .04em; }
+
+    .confess-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .action-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .78rem;
+      font-family: 'Inter', sans-serif;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color .2s;
+    }
+    .action-btn:hover { color: var(--rose); }
+    .action-btn.liked  { color: var(--rose); }
+    .action-btn svg { width: 14px; height: 14px; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--muted);
+      display: none;
+    }
+    .empty-state .big {
+      font-family: 'Caveat', cursive;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--card);
+      border: 1px solid var(--rose-dim);
+      color: var(--cream);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: .85rem;
+      z-index: 999;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 28px;
+      border-top: 1px solid var(--border);
+      font-size: .78rem;
+      color: var(--muted);
+      letter-spacing: .04em;
+    }
+    footer span { color: var(--rose); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .nav-links { gap: 20px; }
+      .hero { padding: 64px 20px 52px; }
+      .compose-card { padding: 24px; }
+      .confess-card { padding: 22px 20px 18px; }
+    }
+    @media (max-width: 400px) {
+      .nav-links { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="logo"><span>b</span>isikan</div>
+    <ul class="nav-links">
+      <li><a href="#feed">Feed</a></li>
+      <li><a href="#tulis">Tulis</a></li>
+      <li><a href="#">Tentang</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <span class="hero-eyebrow">✦ anonim. jujur. aman.</span>
+    <h1>Ada yang ingin<br><em>kamu akui</em> hari ini?</h1>
+    <p class="hero-sub">Ceritakan apa saja — tanpa nama, tanpa jejak. Hanya kata-kata yang perlu diucapkan.</p>
+  </section>
+
+  <!-- Compose -->
+  <div class="compose-wrap" id="tulis">
+    <div class="compose-card">
+      <span class="compose-label">✦ tuliskan pengakuanmu</span>
+      <textarea id="confess-input" placeholder="Aku mau bilang bahwa…" rows="5"></textarea>
+      <div class="compose-divider"></div>
+      <div class="compose-footer">
+        <div class="mood-row">
+          <span class="mood-label">Perasaan</span>
+          <button class="mood-btn" data-mood="sedih">sedih</button>
+          <button class="mood-btn" data-mood="marah">marah</button>
+          <button class="mood-btn" data-mood="senang">senang</button>
+          <button class="mood-btn" data-mood="bingung">bingung</button>
+          <button class="mood-btn" data-mood="cinta">cinta</button>
+        </div>
+        <button class="send-btn" id="send-btn">Kirim →</button>
+      </div>
+      <p class="anon-note">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Identitasmu tidak pernah disimpan
+      </p>
+    </div>
+  </div>
+
+  <!-- Feed -->
+  <section class="feed-section" id="feed">
+    <div class="feed-header">
+      <h2 class="feed-title">Pengakuan terbaru</h2>
+      <span class="feed-count" id="feed-count">6 bisikan</span>
+    </div>
+    <div class="filter-row">
+      <button class="filter-chip active" data-filter="semua">Semua</button>
+      <button class="filter-chip" data-filter="sedih">Sedih</button>
+      <button class="filter-chip" data-filter="marah">Marah</button>
+      <button class="filter-chip" data-filter="senang">Senang</button>
+      <button class="filter-chip" data-filter="bingung">Bingung</button>
+      <button class="filter-chip" data-filter="cinta">Cinta</button>
+    </div>
+    <div class="confess-list" id="confess-list"></div>
+    <div class="empty-state" id="empty-state">
+      <div class="big">🤫</div>
+      <p>Belum ada bisikan di sini.</p>
+    </div>
+  </section>
+
+  <footer>Dibuat dengan <span>♥</span> — semua pengakuan bersifat anonim &amp; tidak dilacak</footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Bisikanmu terkirim 🤫</div>
+
+  <script>
+    const INITIAL = [
+      { text: "Aku suka seseorang yang bahkan tidak tahu aku ada. Sudah dua tahun.", mood: "cinta", time: "2 jam lalu", likes: 47 },
+      { text: "Kadang aku pura-pura sibuk supaya tidak ada yang mengajak keluar. Aku hanya butuh sendiri.", mood: "bingung", time: "5 jam lalu", likes: 89 },
+      { text: "Aku menangis di kamar mandi kantor hari ini. Tidak ada yang tahu. Dan aku tidak apa-apa, kok.", mood: "sedih", time: "8 jam lalu", likes: 124 },
+      { text: "Aku akhirnya bilang 'tidak' tanpa merasa bersalah. Rasanya seperti pertama kali bernapas lega.", mood: "senang", time: "1 hari lalu", likes: 211 },
+      { text: "Aku masih menyimpan semua pesannya meski sudah setahun lebih. Bodoh ya.", mood: "cinta", time: "1 hari lalu", likes: 76 },
+      { text: "Aku marah. Pada semua orang. Pada diriku sendiri. Tapi senyum terus karena tidak ada pilihan lain.", mood: "marah", time: "2 hari lalu", likes: 53 },
+    ];
+
+    let confessions = [...INITIAL];
+    let currentFilter = "semua";
+    let selectedMood = null;
+
+    // Mood buttons
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+        if (selectedMood === btn.dataset.mood) {
+          selectedMood = null;
+        } else {
+          btn.classList.add('active');
+          selectedMood = btn.dataset.mood;
+        }
+      });
+    });
+
+    // Filter chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentFilter = chip.dataset.filter;
+        renderFeed();
+      });
+    });
+
+    // Send
+    document.getElementById('send-btn').addEventListener('click', () => {
+      const input = document.getElementById('confess-input');
+      const text = input.value.trim();
+      if (!text) { input.focus(); return; }
+      const newEntry = {
+        text,
+        mood: selectedMood || 'bingung',
+        time: 'baru saja',
+        likes: 0,
+        isNew: true,
+      };
+      confessions.unshift(newEntry);
+      input.value = '';
+      selectedMood = null;
+      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+      renderFeed();
+      showToast('Bisikanmu terkirim 🤫');
+    });
+
+    function renderFeed() {
+      const list = document.getElementById('confess-list');
+      const empty = document.getElementById('empty-state');
+      const filtered = currentFilter === 'semua'
+        ? confessions
+        : confessions.filter(c => c.mood === currentFilter);
+      document.getElementById('feed-count').textContent = `${filtered.length} bisikan`;
+      if (filtered.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      list.innerHTML = filtered.map((c, i) => `
+        <div class="confess-card" data-mood="${c.mood}" data-index="${confessions.indexOf(c)}"
+             style="animation: fadeIn .3s ease ${i * 0.05}s both">
+          <div class="confess-mood">
+            <span class="dot"></span>${c.mood}
+          </div>
+          <p class="confess-text">${escapeHtml(c.text)}</p>
+          <div class="confess-meta">
+            <span class="confess-time">${c.time}</span>
+            <div class="confess-actions">
+              <button class="action-btn like-btn ${c.liked ? 'liked' : ''}" data-index="${confessions.indexOf(c)}">
+                <svg viewBox="0 0 24 24" fill="${c.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                ${c.likes}
+              </button>
+              <button class="action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                balas
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Like handlers
+      list.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.index);
+          if (!confessions[idx].liked) {
+            confessions[idx].liked = true;
+            confessions[idx].likes++;
+          } else {
+            confessions[idx].liked = false;
+            confessions[idx].likes--;
+          }
+          renderFeed();
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // Keyframe
+    const style = document.createElement('style');
+    style.textContent = `@keyframes fadeIn { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }`;
+    document.head.appendChild(style);
+
+    renderFeed();
+  </script>
+</body>
+</html>
