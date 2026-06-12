@@ -1,9 +1,3 @@
-/* ============================================================
-   bisikan.js — LocalStorage + Animasi & Efek
-   Cara pakai: <script src="bisikan.js"></script>
-   (letakkan sebelum </body>, hapus <script> lama di HTML)
-   ============================================================ */
-
 'use strict';
 
 /* ── Konstanta ── */
