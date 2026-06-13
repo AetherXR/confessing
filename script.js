@@ -1,16 +1,3 @@
-/* ============================================================
-   firebase.js — Integrasi Firebase Firestore untuk Bisikan
-   
-   CARA SETUP (wajib ikuti urutan ini):
-   
-   1. Buka https://console.firebase.google.com
-   2. Klik "Add project" → beri nama (misal: bisikan-app) → Create
-   3. Di dashboard, klik ikon </> (Web) → daftarkan app → copy firebaseConfig
-   4. Tempel config di bagian FIREBASE CONFIG di bawah ini
-   5. Di sidebar Firebase: Build → Firestore Database → Create database
-      → pilih "Start in test mode" → pilih region (asia-southeast2) → Done
-   6. Simpan file ini lalu buka confess.html di browser
-   ============================================================ */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
